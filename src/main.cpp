@@ -33,6 +33,9 @@ int main()
     jugador.scale({0.1f, 0.1f});
 
     //dibujar el enemigo y almacenarlo en un sprite
+    float enemySpeed {110.0};
+    int speedupTime {10};
+    float enemigosSpawnRate {2.0};
     sf::Texture enemigoTextura(enemigoPath, false, sf::IntRect({0, 45}, {1026, 1280}));
     
 
@@ -65,6 +68,7 @@ int main()
     
     sf::Clock clock;
     sf::Clock clockEnemigos;
+    sf::Clock clockTime;
 
     while (window.isOpen())
     {
@@ -112,11 +116,12 @@ int main()
         pista.setTextureRect(pistaRect);
 
         auto enemigo = std::make_shared<sf::Sprite>(enemigoTextura);
-        if (clockEnemigos.getElapsedTime().asSeconds() >= 2.f)
+        if (clockEnemigos.getElapsedTime().asSeconds() >= enemigosSpawnRate)
         {
             enemigo->scale({0.1f, 0.1f});
             enemigo->setPosition({spawnEnemigos[distr(mt)/2], 0.f});
             enemigos.push_back(enemigo);
+            std::cout << "spawning! \n";
             clockEnemigos.restart();
         }
         /* bloque experimental en caso de querer hacer enemigos que se muevan mas rapido
@@ -139,10 +144,17 @@ int main()
         }
         */
 
-        
+        //aumentar la velosida de los enemigo y se ajusta el spawn rate
         for (auto& enemigoPtr : enemigos)
         {
-            enemigoPtr->move({0.f, scrollSpeed * deltaTime});
+            if (clockTime.getElapsedTime().asSeconds() >= speedupTime )
+            {
+                enemySpeed += 10;
+                enemigosSpawnRate -= 0.1; 
+                clockTime.restart();
+            }
+            
+            enemigoPtr->move({0.f, enemySpeed * deltaTime});
         }
 
         if (!enemigos.empty() && enemigos.front()->getPosition().y > windowH)
