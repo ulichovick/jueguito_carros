@@ -27,16 +27,15 @@ int main()
 
 
     //dibujar el jugador y almacenarlo en un sprite
-    sf::Texture jugadorTextura(jugadorPath, false, sf::IntRect({0, 45}, {1026, 1280}));
+    sf::Texture jugadorTextura(jugadorPath, false, sf::IntRect({0, 0}, {91, 116}));
     sf::Sprite jugador(jugadorTextura);
     jugador.setPosition({466.f, 570.f});
-    jugador.scale({0.1f, 0.1f});
 
     //dibujar el enemigo y almacenarlo en un sprite
     float enemySpeed {110.0};
     int speedupTime {10};
     float enemigosSpawnRate {2.0};
-    sf::Texture enemigoTextura(enemigoPath, false, sf::IntRect({0, 45}, {1026, 1280}));
+    sf::Texture enemigoTextura(enemigoPath, false, sf::IntRect({0, 0}, {91, 116}));
     
 
     //fuente del score
@@ -57,11 +56,12 @@ int main()
     //textoScore.setPosition({250, 700});
 
     int puntuacion{};
+    int contador{};
 
     std::random_device rd{};
     std::seed_seq ss{ rd(), rd(), rd(), rd(), rd(), rd(), rd(), rd() };
     std::mt19937 mt{ss};
-    float spawnEnemigos[3] {375.f, 466.f, 557.f};
+    float spawnEnemigos[3] {370.f, 466.f, 562.f};
 
     std::vector<std::shared_ptr<sf::Sprite>> enemigos;
     std::uniform_int_distribution distr{0, 5};
@@ -84,7 +84,7 @@ int main()
                 sf::Vector2f posActual = jugador.getPosition();
                 if (posActual.x > spawnEnemigos[0])
                 {
-                    jugador.setPosition({posActual.x - 91.f , 570.f});
+                    jugador.setPosition({posActual.x - 96.f , 570.f});
                 }
             }
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right))
@@ -92,7 +92,8 @@ int main()
                 sf::Vector2f posActual = jugador.getPosition();
                 if (posActual.x < spawnEnemigos[2])
                 {
-                    jugador.setPosition({posActual.x + 91.f , 570.f}); 
+                    jugador.setPosition({posActual.x + 96.f , 570.f}); 
+
                 }
                 
                 
@@ -118,10 +119,8 @@ int main()
         auto enemigo = std::make_shared<sf::Sprite>(enemigoTextura);
         if (clockEnemigos.getElapsedTime().asSeconds() >= enemigosSpawnRate)
         {
-            enemigo->scale({0.1f, 0.1f});
             enemigo->setPosition({spawnEnemigos[distr(mt)/2], 0.f});
             enemigos.push_back(enemigo);
-            std::cout << "spawning! \n";
             clockEnemigos.restart();
         }
         /* bloque experimental en caso de querer hacer enemigos que se muevan mas rapido
@@ -155,6 +154,15 @@ int main()
             }
             
             enemigoPtr->move({0.f, enemySpeed * deltaTime});
+        }
+
+        auto hitboxJugador = jugador.getGlobalBounds();
+
+        if (!enemigos.empty() && hitboxJugador.findIntersection(enemigos.front()->getGlobalBounds()).has_value() )
+        {
+
+            std::cout << "game over! "<< contador << " \n";
+            contador++;
         }
 
         if (!enemigos.empty() && enemigos.front()->getPosition().y > windowH)
