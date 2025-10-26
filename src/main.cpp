@@ -11,7 +11,7 @@ int main()
     window.setFramerateLimit(60);
 
     //arreglar el acceso a filesystem... eta verga ta fea
-    auto assetsPath = std::filesystem::current_path().parent_path().parent_path().parent_path() / "Assets";
+    auto assetsPath = std::filesystem::current_path() / "Assets";
     auto pistaPath = assetsPath / "Track.png";
     auto jugadorPath = assetsPath / "Player.png";
     auto enemigoPath = assetsPath / "Enemy.png";
@@ -39,8 +39,8 @@ int main()
     
 
     //fuente del score
-    auto fontPath = std::filesystem::current_path().parent_path().parent_path();
-    fontPath = fontPath.parent_path() / "Assets" / "Fonts" / "kenney_mini_square.ttf";
+    auto fontPath = std::filesystem::current_path();
+    fontPath = fontPath / "Assets" / "Fonts" / "kenney_mini_square.ttf";
 
     sf::Font scoreFont;
 
@@ -162,6 +162,7 @@ int main()
         {
 
             std::cout << "game over! "<< contador << " \n";
+            enemigos.erase(enemigos.begin());
             contador++;
         }
 

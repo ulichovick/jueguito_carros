@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.28)
 project(CMakeSFMLProject LANGUAGES CXX)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
 file(GLOB_RECURSE SOURCES
     src/*.cpp
@@ -20,6 +20,17 @@ FetchContent_Declare(SFML
     SYSTEM)
 FetchContent_MakeAvailable(SFML)
 
+set(ASSETS_DIR "${CMAKE_SOURCE_DIR}/Assets")
+set(OUTPUT_ASSETS_DIR "$<TARGET_FILE_DIR:main>/Assets")
+
+
 add_executable(main ${SOURCES} ${HEADERS})
 target_compile_features(main PRIVATE cxx_std_17)
 target_link_libraries(main PRIVATE SFML::Graphics)
+add_custom_command(
+    TARGET main POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${ASSETS_DIR}"
+        "${OUTPUT_ASSETS_DIR}"
+    COMMENT "Copying Assets folder to build directory..."
+)
