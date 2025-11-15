@@ -95,8 +95,6 @@ int main()
                     jugador.setPosition({posActual.x + 96.f , 570.f}); 
 
                 }
-                
-                
             }
         }
         /* controles de jugador que agregan offset a la posicion

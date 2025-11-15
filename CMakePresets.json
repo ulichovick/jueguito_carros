@@ -25,5 +25,19 @@
                 "CMAKE_BUILD_TYPE": "Debug"
             }
         }
+    ],
+    "buildPresets": [
+        {
+            "name": "release",
+            "configurePreset": "release",
+            "jobs": 16,
+            "displayName": "Build Release (parallel)"
+        },
+        {
+            "name": "debug",
+            "configurePreset": "debug",
+            "jobs": 16,
+            "displayName": "Build Debug (parallel)"
+        }
     ]
 }
