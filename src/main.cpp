@@ -27,7 +27,7 @@ int main()
 
 
     //dibujar el jugador y almacenarlo en un sprite
-    sf::Texture jugadorTextura(jugadorPath, false, sf::IntRect({0, 0}, {91, 116}));
+    sf::Texture jugadorTextura(jugadorPath, false, sf::IntRect({0, 0}, {91, 122}));
     sf::Sprite jugador(jugadorTextura);
     jugador.setPosition({466.f, 570.f});
 
@@ -35,7 +35,7 @@ int main()
     float enemySpeed {110.0};
     int speedupTime {10};
     float enemigosSpawnRate {2.0};
-    sf::Texture enemigoTextura(enemigoPath, false, sf::IntRect({0, 0}, {91, 116}));
+    sf::Texture enemigoTextura(enemigoPath, false, sf::IntRect({0, 0}, {91, 122}));
     
 
     //fuente del score
