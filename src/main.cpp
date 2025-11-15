@@ -1,3 +1,4 @@
+#include "game_graphics.hpp"
 #include <SFML/Graphics.hpp>
 #include <filesystem>
 #include <iostream>
@@ -27,8 +28,15 @@ int main()
 
 
     //dibujar el jugador y almacenarlo en un sprite
+
+    /*
     sf::Texture jugadorTextura(jugadorPath, false, sf::IntRect({0, 0}, {91, 122}));
     sf::Sprite jugador(jugadorTextura);
+    */
+   //set a pointer to the texture
+    sf::Vector2i posIni(0,0);
+    sf::Vector2i tamanio(0,0);
+    auto jugador = spritesJuego(jugadorPath, posIni, tamanio);
     jugador.setPosition({466.f, 570.f});
 
     //dibujar el enemigo y almacenarlo en un sprite
