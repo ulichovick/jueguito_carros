@@ -27,15 +27,10 @@ int main()
 
 
     //dibujar el jugador y almacenarlo en un sprite
-
-    /*
-    sf::Texture jugadorTextura(jugadorPath, false, sf::IntRect({0, 0}, {91, 122}));
-    sf::Sprite jugador(jugadorTextura);
-    */
-   //set a pointer to the texture
     sf::Vector2i posIni(0,0);
-    sf::Vector2i tamanio(0,0);
-    auto jugador = spritesJuego(jugadorPath, posIni, tamanio);
+    sf::Vector2i tamanio(91,122);
+    sf::Texture jugadorTextura(jugadorPath, false, sf::IntRect(posIni, tamanio));
+    Entidad jugador(jugadorTextura);
     jugador.setPosition({466.f, 570.f});
 
     //dibujar el enemigo y almacenarlo en un sprite
@@ -43,7 +38,6 @@ int main()
     int speedupTime {10};
     float enemigosSpawnRate {2.0};
     sf::Texture enemigoTextura(enemigoPath, false, sf::IntRect({0, 0}, {91, 122}));
-    
 
     //fuente del score
     auto fontPath = std::filesystem::current_path();
@@ -121,9 +115,12 @@ int main()
         pistaRect.position.y -= static_cast<int>(scrollSpeed * deltaTime);
         pista.setTextureRect(pistaRect);
 
-        auto enemigo = std::make_shared<sf::Sprite>(enemigoTextura);
+
+        //TODO: usar la clasesita (tal vez) y buscar alguna mierda pa haer esto mas modular!
+        
         if (clockEnemigos.getElapsedTime().asSeconds() >= enemigosSpawnRate)
         {
+            auto enemigo = std::make_shared<sf::Sprite>(enemigoTextura);
             enemigo->setPosition({spawnEnemigos[distr(mt)/2], 0.f});
             enemigos.push_back(enemigo);
             clockEnemigos.restart();
