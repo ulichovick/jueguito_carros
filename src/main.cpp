@@ -16,7 +16,6 @@ int main()
     auto pistaPath = assetsPath / "Track.png";
     auto jugadorPath = assetsPath / "Player.png";
     auto enemigoPath = assetsPath / "Enemy.png";
-    
 
     //dibujar el fondo (pista) y agregar su velocidad de desplazamiento (also, ponerla en bucle)
     float scrollSpeed {100.0};
