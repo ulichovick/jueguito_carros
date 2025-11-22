@@ -34,7 +34,7 @@ int main()
     jugador.setPosition({466.f, 570.f});
 
     //dibujar el enemigo y almacenarlo en un sprite
-    float enemySpeed {110.0};
+    float enemySpeed {150.0};
     int speedupTime {10};
     float enemigosSpawnRate {2.0};
     sf::Texture enemigoTextura(enemigoPath, false, sf::IntRect({0, 0}, {91, 122}));
@@ -120,6 +120,7 @@ int main()
         
         if (clockEnemigos.getElapsedTime().asSeconds() >= enemigosSpawnRate)
         {
+            std::cout << "spawn time: " << enemigosSpawnRate << "\n";
             auto enemigo = std::make_shared<sf::Sprite>(enemigoTextura);
             enemigo->setPosition({spawnEnemigos[distr(mt)/2], 0.f});
             enemigos.push_back(enemigo);
@@ -148,14 +149,14 @@ int main()
         //aumentar la velosida de los enemigo y se ajusta el spawn rate
         for (auto& enemigoPtr : enemigos)
         {
+            enemigoPtr->move({0.f, enemySpeed * deltaTime});
             if (clockTime.getElapsedTime().asSeconds() >= speedupTime )
             {
-                enemySpeed += 10;
-                enemigosSpawnRate -= 0.1; 
+                enemySpeed += (enemySpeed*0.1);
+                enemigosSpawnRate -= (enemigosSpawnRate*0.1); 
+                std::cout << "-------------------------------------------------BOOST-----------------------------------------------------" << "\n";
                 clockTime.restart();
             }
-            
-            enemigoPtr->move({0.f, enemySpeed * deltaTime});
         }
 
         auto hitboxJugador = jugador.getGlobalBounds();
