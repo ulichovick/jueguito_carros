@@ -58,6 +58,7 @@ int main()
 
     int puntuacion{};
     int contador{};
+    int nivel{};
 
     std::random_device rd{};
     std::seed_seq ss{ rd(), rd(), rd(), rd(), rd(), rd(), rd(), rd() };
@@ -150,12 +151,13 @@ int main()
         for (auto& enemigoPtr : enemigos)
         {
             enemigoPtr->move({0.f, enemySpeed * deltaTime});
-            if (clockTime.getElapsedTime().asSeconds() >= speedupTime )
+            if (clockTime.getElapsedTime().asSeconds() >= speedupTime && nivel <= 10 )
             {
                 enemySpeed += (enemySpeed*0.1);
                 enemigosSpawnRate -= (enemigosSpawnRate*0.1); 
-                std::cout << "-------------------------------------------------BOOST-----------------------------------------------------" << "\n";
                 clockTime.restart();
+                std::cout << "nivel: "  << nivel << "\n";
+                nivel++;
             }
         }
 
