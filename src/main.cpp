@@ -17,6 +17,9 @@ int main()
     auto jugadorPath = assetsPath / "Player.png";
     auto enemigoPath = assetsPath / "Enemy.png";
 
+    int puntuacion {0};
+    int nivel {1};
+
     //dibujar el fondo (pista) y agregar su velocidad de desplazamiento (also, ponerla en bucle)
     float scrollSpeed {100.0};
     sf::Texture pistaTextura(pistaPath, false, sf::IntRect({0, 287}, {1024, 852}));
@@ -35,7 +38,7 @@ int main()
 
     //dibujar el enemigo y almacenarlo en un sprite
     float enemySpeed {150.0};
-    int speedupTime {10};
+    int speedupTime {15};
     float enemigosSpawnRate {2.0};
     sf::Texture enemigoTextura(enemigoPath, false, sf::IntRect({0, 0}, {91, 122}));
 
@@ -51,19 +54,34 @@ int main()
         exit(-1);
     }
     
-    sf::String scoreString = "Score: ";
+    sf::String scoreString = "Puntuacion: ";
     sf::Text textoScore(scoreFont);
     textoScore.setString(scoreString);
     //textoScore.setPosition({250, 700});
 
-    int puntuacion{};
-    int contador{};
-    int nivel{};
+    sf::String nuevoJuego = "Para iniciar a jugar presione Enter";
+    sf::Text textoNuevo(scoreFont);
+    textoNuevo.setString(nuevoJuego);
+    textoNuevo.setPosition({210, 325});
+
+    sf::String textoOver = "Juego terminado, Puntuacion: ";
+    sf::Text gameOver(scoreFont);
+    gameOver.setString(textoOver);
+    gameOver.setPosition({210, 300});
+
+    sf::String textoNivel = "Nivel: ";
+    sf::Text cadenaNivel(scoreFont);
+    cadenaNivel.setString(textoNivel);
+    cadenaNivel.setPosition({0, 50});
+    cadenaNivel.setString(textoNivel + std::to_string(nivel));
 
     std::random_device rd{};
     std::seed_seq ss{ rd(), rd(), rd(), rd(), rd(), rd(), rd(), rd() };
     std::mt19937 mt{ss};
     float spawnEnemigos[3] {370.f, 466.f, 562.f};
+
+    //estados del juego -> 0: Juego nuevo, 1: jugando, 2: game over
+    int estadosJuego {};
 
     std::vector<std::shared_ptr<sf::Sprite>> enemigos;
     std::uniform_int_distribution distr{0, 5};
@@ -98,6 +116,10 @@ int main()
 
                 }
             }
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Enter))
+            {
+                estadosJuego = 1;
+            }
         }
         /* controles de jugador que agregan offset a la posicion
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left))
@@ -116,79 +138,77 @@ int main()
         pistaRect.position.y -= static_cast<int>(scrollSpeed * deltaTime);
         pista.setTextureRect(pistaRect);
 
-
-        //TODO: usar la clasesita (tal vez) y buscar alguna mierda pa haer esto mas modular!
-        
-        if (clockEnemigos.getElapsedTime().asSeconds() >= enemigosSpawnRate)
-        {
-            std::cout << "spawn time: " << enemigosSpawnRate << "\n";
-            auto enemigo = std::make_shared<sf::Sprite>(enemigoTextura);
-            enemigo->setPosition({spawnEnemigos[distr(mt)/2], 0.f});
-            enemigos.push_back(enemigo);
-            clockEnemigos.restart();
-        }
-        /* bloque experimental en caso de querer hacer enemigos que se muevan mas rapido
-        for (auto it = enemigos.begin(); it != enemigos.end(); )
-        {
-            auto& enemigo = *it;
-            enemigo->move({0.f, scrollSpeed * deltaTime});
-
-            // Check if enemy is below the window
-            if (enemigo->getPosition().y > window.getSize().y)
-            {
-                it = enemigos.erase(it); // remove and advance safely
-                std::cout << "Enemy removed, total: " << enemigos.size() << "\n";
-            }
-            else
-            {
-                window.draw(*enemigo);
-                ++it; // advance only if not erased
-            }
-        }
-        */
-
-        //aumentar la velosida de los enemigo y se ajusta el spawn rate
-        for (auto& enemigoPtr : enemigos)
-        {
-            enemigoPtr->move({0.f, enemySpeed * deltaTime});
-            if (clockTime.getElapsedTime().asSeconds() >= speedupTime && nivel <= 10 )
-            {
-                enemySpeed += (enemySpeed*0.1);
-                enemigosSpawnRate -= (enemigosSpawnRate*0.1); 
-                clockTime.restart();
-                std::cout << "nivel: "  << nivel << "\n";
-                nivel++;
-            }
-        }
-
         auto hitboxJugador = jugador.getGlobalBounds();
 
-        if (!enemigos.empty() && hitboxJugador.findIntersection(enemigos.front()->getGlobalBounds()).has_value() )
+        if (estadosJuego == 1)
         {
+            /* code */
+            if (clockEnemigos.getElapsedTime().asSeconds() >= enemigosSpawnRate)
+            {
+                auto enemigo = std::make_shared<sf::Sprite>(enemigoTextura);
+                enemigo->setPosition({spawnEnemigos[distr(mt)/2], 0.f});
+                enemigos.push_back(enemigo);
+                clockEnemigos.restart();
+            }
 
-            std::cout << "game over! "<< contador << " \n";
-            enemigos.erase(enemigos.begin());
-            contador++;
-        }
+            //aumentar la velosida de los enemigo y se ajusta el spawn rate
+            for (auto& enemigoPtr : enemigos)
+            {
+                enemigoPtr->move({0.f, enemySpeed * deltaTime});
+                if (clockTime.getElapsedTime().asSeconds() >= speedupTime && nivel <= 10 )
+                {
+                    enemySpeed += (enemySpeed*0.15);
+                    enemigosSpawnRate -= (enemigosSpawnRate*0.15); 
+                    clockTime.restart();
+                    cadenaNivel.setString(textoNivel + std::to_string(nivel));
+                    nivel++;
+                }
+            }
 
-        if (!enemigos.empty() && enemigos.front()->getPosition().y > windowH)
-        {
-            enemigos.erase(enemigos.begin()); // removes the last element safely
-            puntuacion++;
-            textoScore.setString(scoreString + std::to_string(puntuacion));
+            if (!enemigos.empty() && hitboxJugador.findIntersection(enemigos.front()->getGlobalBounds()).has_value() )
+            {
+                gameOver.setString(textoOver + std::to_string(puntuacion));
+                enemigos.clear();
+                estadosJuego = 2;
+                enemySpeed = 150.0;
+                enemigosSpawnRate = 2.0;
+                clockTime.restart();
+            }
+
+            if (!enemigos.empty() && enemigos.front()->getPosition().y > windowH)
+            {
+                enemigos.erase(enemigos.begin()); // removes the last element safely
+                puntuacion++;
+                textoScore.setString(scoreString + std::to_string(puntuacion));
+            }
         }
 
         window.clear();
         window.draw(pista);
-        window.draw(textoScore);
-        window.draw(jugador);
-        
-        for (auto& enemigoPtr : enemigos)
+        if (estadosJuego == 0)
         {
-            window.draw(*enemigoPtr);
-
+            window.draw(textoNuevo);
+            window.draw(jugador);
         }
-
+        else if (estadosJuego == 1)
+        {
+            window.draw(textoScore);
+            window.draw(cadenaNivel);
+            window.draw(jugador);
+            for (auto& enemigoPtr : enemigos)
+            {
+                window.draw(*enemigoPtr);
+            }
+        }
+        else
+        {
+            puntuacion = 0;
+            nivel = 1;
+            textoScore.setString(scoreString + std::to_string(puntuacion));
+            cadenaNivel.setString(textoNivel + std::to_string(nivel));
+            window.draw(textoNuevo);
+            window.draw(gameOver);
+        }
         window.display();
     }
 }
